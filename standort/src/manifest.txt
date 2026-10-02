@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-MIDlet-1: 3 Standort, /icon.png, Standort
-MIDlet-Icon: /icon.png
-MIDlet-Name: 3 Standort
-MIDlet-Vendor: Enzo
-MIDlet-Version: 1.0.0
-MicroEdition-Profile: MIDP-2.0
-MicroEdition-Configuration: CLDC-1.1
