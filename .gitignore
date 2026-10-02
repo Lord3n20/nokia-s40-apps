@@ -1,8 +1,7 @@
-# Schlüssel, Adressen, Signier-Zertifikat, Bluetooth-Adresse – nie veröffentlichen
-privat/
-# Erzeugt
+# Keys, URLs, signing certificate, Bluetooth address – never publish
+private/
+# Generated
 */build/
 */dist/
-werkzeuge/build/
-werkzeuge/ecj.jar
-werkzeuge/ecj.jar.tmp
+tools/ecj.jar
+tools/ecj.jar.tmp

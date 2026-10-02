@@ -1,67 +1,66 @@
 # nokia-s40-apps
 
-Drei kleine Java-ME-Apps (CLDC 1.1 / MIDP 2.0) für ein Nokia 6303i classic (Series 40), die über
-eine eigene Brücke in Home Assistant mit der heutigen Welt reden. Die Brücken liegen im Repo
+Small Java ME apps (CLDC 1.1 / MIDP 2.0) for a Nokia 6303i classic (Series 40) that talk to today's
+world through their own bridge running in Home Assistant. The bridges live in
 [Lord3n20/server-homeassistant](https://github.com/Lord3n20/server-homeassistant).
+The apps themselves are in German.
 
-| App | Ordner | Brücke | Was |
+| App | Folder | Bridge | What |
 |---|---|---|---|
-| 1 Signal | `signal/` | `nokia-signal-app` | Signal lesen und schreiben, Bilder ansehen und senden, Fotos mit der Kamera. Verschlüsselt (ChaCha20 + HMAC), weil das Handy kein modernes TLS kann. |
-| 2 Home Assistant | `homeassistant/` | `nokia-bridge-app` | Ein Dashboard aus Home Assistant als Text und kleine Graphen. |
+| 1 Signal | `signal/` | `nokia-signal-app` | Read and write Signal messages, view and send pictures, take photos with the camera. Encrypted (ChaCha20 + HMAC), because the phone cannot do modern TLS. |
+| 2 Home Assistant | `homeassistant/` | `nokia-bridge-app` | A Home Assistant dashboard as text and small graphs. |
 
-## Bauen
+## Building
 
-Gebraucht werden Java, `jar`, `openssl`, `curl` und die MIDP/CLDC-Bibliotheken von
-[MicroEmulator](https://github.com/barteo/microemu) (unter Arch: AUR-Paket `microemulator`; anderer
-Ort per `MICROEMU_LIB=/pfad/zu/lib`). Der Compiler (ecj 4.5.1) wird beim ersten Bauen von Maven
-Central geladen und per SHA-256 geprüft.
+You need Java, `jar`, `openssl`, `curl` and the MIDP/CLDC libraries from
+[MicroEmulator](https://github.com/barteo/microemu) (on Arch: AUR package `microemulator`; other
+location via `MICROEMU_LIB=/path/to/lib`). The compiler (ecj 4.5.1) is downloaded from Maven
+Central on the first build and checked by SHA-256.
 
     signal/build.sh          # → signal/dist/Signal.jad + Signal.jar
     homeassistant/build.sh
-    standort/build.sh
 
-`ecj -target cldc1.1` erzeugt Klassen mit StackMap, ein `preverify` ist nicht nötig.
+`ecj -target cldc1.1` writes classes with StackMap, so no `preverify` step is needed.
 
-## Eigene Daten: `privat/`
+## Your own data: `private/`
 
-Alles Persönliche liegt in `privat/` und ist per `.gitignore` ausgeschlossen:
+Everything personal goes into `private/`, which is excluded by `.gitignore`:
 
-| Datei | Wofür |
+| File | Purpose |
 |---|---|
-| `signal-adresse.txt`, `signal-schluessel.txt` | Adresse und Schlüssel der Signal-Brücke, werden als `SG-Url` / `SG-Key` eingebaut |
-| `homeassistant-adresse.txt`, `homeassistant-schluessel.txt` | dasselbe für die HA-Brücke (`HA-Url` / `HA-Key`) |
-| `zertifikat/zertifikat.pem`, `zertifikat/schluessel.pem` | eigenes Zertifikat zum Signieren (optional) |
-| `gammu-bluetooth.rc` | gammu-Einstellungen fürs Hochladen, Vorlage in `werkzeuge/gammu-bluetooth.rc.beispiel` |
+| `signal-url.txt`, `signal-key.txt` | URL and key of the Signal bridge, baked in as `SG-Url` / `SG-Key` |
+| `homeassistant-url.txt`, `homeassistant-key.txt` | the same for the Home Assistant bridge (`HA-Url` / `HA-Key`) |
+| `certificate/certificate.pem`, `certificate/key.pem` | own certificate for signing (optional) |
+| `gammu-bluetooth.rc` | gammu settings for uploading, template in `tools/gammu-bluetooth.rc.example` |
 
-Ohne diese Dateien bauen die Apps trotzdem; Adresse und Schlüssel tippt man dann am Handy in den
-Einstellungen ein, und die Apps sind unsigniert.
+Without these files the apps still build; URL and key are then typed into the settings on the
+phone, and the apps are unsigned.
 
-## Aufs Handy
+## Getting it onto the phone
 
-    ./hochladen.sh signal     # per Bluetooth über gammu, liest zur Kontrolle zurück
+    ./upload.sh signal     # over Bluetooth with gammu, reads the files back to check
 
-App am Handy vorher beenden. gammus Schlussmeldung „Datei existiert nicht“ ist beim 6303i falsch.
-Ohne Bluetooth: Handy per USB als Massenspeicher anschließen und `<app>/COPY.sh`.
-Signierte Apps brauchen `.jad` und `.jar` zusammen auf der Karte; nach jedem Bauen beide neu kopieren.
+Close the app on the phone first. gammu's final "file does not exist" message is wrong on the 6303i.
+Without Bluetooth: connect the phone over USB as mass storage and run `<app>/COPY.sh`.
+Signed apps need the `.jad` and the `.jar` on the card together; copy both again after every build.
 
-## Signieren und was das 6303i erlaubt
+## Signing, and what the 6303i allows
 
-Unsignierte Apps fragen bei jedem Netzzugriff nach. Mit einem eigenen Zertifikat lässt sich das
-abstellen: Das Zertifikat (DER) kommt in den Ordner `d:/predefhiddenfolder/certificates/user` des
-Handys, und der zugehörige Eintrag in `ext_info.sys` muss die Verwendung „Code-Signierung“
-enthalten (OID 1.3.6.1.5.5.7.3.3). Danach vertraut das Handy Apps, die mit diesem Zertifikat
-signiert sind.
+Unsigned apps ask for permission on every network access. An own certificate stops that: put the
+certificate (DER) into the phone's folder `d:/predefhiddenfolder/certificates/user`, and make its
+entry in `ext_info.sys` list the usage "code signing" (OID 1.3.6.1.5.5.7.3.3). After that the
+phone trusts apps signed with this certificate.
 
-Grenzen, die auch mit Signatur bleiben:
+Limits that stay even when signed:
 
-- Java-Apps laufen nicht im Hintergrund; `Nokia-MIDlet-No-Exit` wird ignoriert.
-- Autostart (PushRegistry-Wecker) und Netzzugriff dürfen nicht beide auf „immer erlaubt“ stehen
-  (MIDP-2-Sicherheitsregel), eine Abfrage bleibt also beim Wecken immer sichtbar.
-- Kein Zugriff auf Anrufliste, Funkzelle oder Standort.
+- Java apps do not run in the background; `Nokia-MIDlet-No-Exit` is ignored.
+- Auto start (PushRegistry alarm) and network access cannot both be set to "always allowed"
+  (a MIDP 2 security rule), so waking the app up always shows a prompt.
+- No access to the call log, the cell ID or the location.
 
-Für Benachrichtigungen ruft die Signal-Brücke deshalb bei neuen Nachrichten kurz über SIP an
-(z. B. über ein IP-Telefon der FritzBox) und legt wieder auf.
+That is why the Signal bridge notifies about new messages with a short SIP call (e.g. through an
+IP phone on a FritzBox) and hangs up before anyone answers.
 
-## Lizenz
+## License
 
-Gemeinfrei ([Unlicense](LICENSE)): Mach damit, was du willst.
+Public domain ([Unlicense](LICENSE)): do whatever you want with it.

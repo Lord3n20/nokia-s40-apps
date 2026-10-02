@@ -1,5 +1,5 @@
 #!/bin/bash
-# Baut dist/HomeAssistant.jar + .jad (unsigniert).
+# Builds dist/HomeAssistant.jar + .jad (unsigned).
 cd "$(dirname "$0")"
-source ../werkzeuge/bauen.sh
-bauen HomeAssistant HA "" "" nein
+source ../tools/common.sh
+build_app HomeAssistant HA "" "" no
