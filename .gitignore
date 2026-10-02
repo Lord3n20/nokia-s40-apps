@@ -1,0 +1,8 @@
+# Schlüssel, Adressen, Signier-Zertifikat, Bluetooth-Adresse – nie veröffentlichen
+privat/
+# Erzeugt
+*/build/
+*/dist/
+werkzeuge/build/
+werkzeuge/ecj.jar
+werkzeuge/ecj.jar.tmp
