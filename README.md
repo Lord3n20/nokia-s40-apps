@@ -8,7 +8,6 @@ eine eigene Brücke in Home Assistant mit der heutigen Welt reden. Die Brücken 
 |---|---|---|---|
 | 1 Signal | `signal/` | `nokia-signal-app` | Signal lesen und schreiben, Bilder ansehen und senden, Fotos mit der Kamera. Verschlüsselt (ChaCha20 + HMAC), weil das Handy kein modernes TLS kann. |
 | 2 Home Assistant | `homeassistant/` | `nokia-bridge-app` | Ein Dashboard aus Home Assistant als Text und kleine Graphen. |
-| 3 Standort | `standort/` | – | Test, was das Handy einer Java-App über Funkzelle und Standort verrät. Beim 6303i: nichts Brauchbares. |
 
 ## Bauen
 
